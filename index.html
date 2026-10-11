@@ -317,6 +317,12 @@
       </div>
       <input type="file" accept=".json,application/json" id="json-file" class="file-input-hidden" onchange="handleJsonImport(event)">
     </div>
+
+    <div class="io-block">
+      <h4>Borrar toda la lista</h4>
+      <p>Útil si una importación salió mal y quieres empezar de cero.</p>
+      <button class="btn-secondary" onclick="clearAllWords()">Borrar todas las palabras</button>
+    </div>
   </section>
 
 </div>
@@ -670,7 +676,8 @@ function renderManage(){
 }
 
 /* ---------- CSV ---------- */
-function parseCsvLine(line){
+function parseCsvLine(line, delim){
+  delim = delim || ',';
   const out = [];
   let cur = '', inQuotes = false;
   for(let i=0;i<line.length;i++){
@@ -681,7 +688,7 @@ function parseCsvLine(line){
       else cur += c;
     } else {
       if(c === '"') inQuotes = true;
-      else if(c === ','){ out.push(cur); cur=''; }
+      else if(c === delim){ out.push(cur); cur=''; }
       else cur += c;
     }
   }
@@ -689,36 +696,61 @@ function parseCsvLine(line){
   return out.map(s=>s.trim());
 }
 
+function decodeText(buf){
+  try{ return new TextDecoder('utf-8',{fatal:true}).decode(buf); }
+  catch(e){ return new TextDecoder('windows-1252').decode(buf); }
+}
 function handleCsvImport(evt){
   const file = evt.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = function(e){
-    const text = e.target.result;
+    const buf = e.target.result;
+    const head = new Uint8Array(buf.slice(0,2));
+    if(head[0]===0x50 && head[1]===0x4B){
+      alert('Este archivo es un Excel (.xlsx), no un CSV.\n\nEn Excel: Archivo → Guardar como → "CSV UTF-8 (delimitado por comas)" y vuelve a cargarlo.');
+      evt.target.value='';
+      return;
+    }
+    let text = decodeText(buf).replace(/^\uFEFF/,'');
     const lines = text.split(/\r?\n/).filter(l => l.trim().length>0);
     if(lines.length===0){ toast('Archivo vacío.'); return; }
+    const first = lines[0];
+    const counts = { ';':(first.match(/;/g)||[]).length, ',':(first.match(/,/g)||[]).length, '\t':(first.match(/\t/g)||[]).length };
+    const delim = Object.keys(counts).sort((x,y)=>counts[y]-counts[x])[0];
     let start = 0;
-    const firstCols = parseCsvLine(lines[0]).map(s=>normalize(s));
+    const firstCols = parseCsvLine(first, delim).map(x=>normalize(x));
     if(firstCols[0] && (firstCols[0].includes('ingles') || firstCols[0].includes('english') || firstCols[0]==='en')){
       start = 1;
     }
-    let added = 0, updated = 0;
+    let added = 0, updated = 0, skipped = 0;
     for(let i=start;i<lines.length;i++){
-      const cols = parseCsvLine(lines[i]);
+      const cols = parseCsvLine(lines[i], delim);
       const en = (cols[0]||'').trim();
       const es = (cols[1]||'').trim();
       const pos = (cols[2]||'').trim().toLowerCase();
-      if(!en || !es) continue;
+      if(!en || !es){ skipped++; continue; }
       const existing = words.find(w => normalize(w.en) === normalize(en));
       if(existing){ existing.es = es; if(pos) existing.pos = pos; updated++; }
       else{ words.push({ id: uid(), en, es, pos: pos||'', img:null, correctCount:0, wrongCount:0 }); added++; }
     }
     saveWords();
     renderManage();
-    toast(`Importado: ${added} nuevas, ${updated} actualizadas.`);
+    renderMenu();
+    toast(`Importado: ${added} nuevas, ${updated} actualizadas` + (skipped?`, ${skipped} omitidas.`:'.'));
     evt.target.value = '';
   };
-  reader.readAsText(file, 'UTF-8');
+  reader.readAsArrayBuffer(file);
+}
+
+function clearAllWords(){
+  if(words.length===0){ toast('La lista ya está vacía.'); return; }
+  if(!confirm(`Se borrarán las ${words.length} palabras (y su progreso). ¿Seguro?`)) return;
+  words = [];
+  saveWords();
+  renderManage();
+  renderMenu();
+  toast('Lista borrada.');
 }
 
 function csvEscape(s){
