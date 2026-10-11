@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vocabulario en Inglés</title>
+<style>
+  :root{
+    --ink:#16223B;
+    --ink-2:#233254;
+    --paper:#FAF6EF;
+    --paper-2:#F0E9D8;
+    --gold:#C9A227;
+    --gold-dim:#8f7420;
+    --green:#3F7D58;
+    --red:#B3423F;
+    --sky:#8CA6BD;
+    --line: rgba(255,255,255,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background: radial-gradient(1200px 800px at 80% -10%, #1c2c4d 0%, var(--ink) 55%, #101a30 100%);
+    color: var(--paper);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height:100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @font-face{ font-family:'Fraunces-fallback'; src:local('Georgia'); }
+  .display{ font-family: Georgia, 'Times New Roman', serif; font-weight:700; letter-spacing:0.2px;}
+  .mono{ font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; }
+
+  #app{ max-width:720px; margin:0 auto; padding:22px 18px 60px; }
+
+  header.top{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:22px; }
+  header.top h1{ display:none; }
+  .brand{ display:flex; flex-direction:column; }
+  .brand .eyebrow{ font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); margin-bottom:4px;}
+  .brand .title{ font-size:26px; }
+
+  .screen{ display:none; }
+  .screen.active{ display:block; animation: fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  /* MENU */
+  .menu-grid{ display:grid; grid-template-columns:1fr; gap:14px; margin-top:10px;}
+  .menu-card{
+    background: var(--paper); color:var(--ink); border-radius:14px; padding:18px 20px;
+    border:none; text-align:left; cursor:pointer; position:relative; overflow:hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+  }
+  .menu-card:active{ transform: scale(0.985); }
+  .menu-card .stub{ position:absolute; right:0; top:0; bottom:0; width:10px; background:repeating-linear-gradient(to bottom, transparent 0 6px, rgba(0,0,0,0.12) 6px 9px); }
+  .menu-card h3{ margin:0 0 4px; font-size:19px; }
+  .menu-card p{ margin:0; font-size:13.5px; color:#5b5340; }
+  .menu-card .num{ font-family: 'SFMono-Regular', Consolas, monospace; font-size:12px; color:var(--gold-dim); letter-spacing:1px; }
+
+  .dir-toggle{ display:flex; gap:8px; margin:16px 0 4px; }
+  .dir-btn{ flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--line); color:var(--sky); border-radius:10px; padding:10px 8px; font-size:13px; cursor:pointer; text-align:center; }
+  .dir-btn.active{ background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600; }
+
+  .stat-strip{ display:flex; gap:10px; margin:18px 0 4px; }
+  .stat-pill{ flex:1; background:rgba(255,255,255,0.06); border:1px solid var(--line); border-radius:10px; padding:10px 12px; text-align:center; }
+  .stat-pill .n{ font-size:20px; font-family: 'SFMono-Regular', Consolas, monospace; color:var(--gold); }
+  .stat-pill .l{ font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--sky); margin-top:2px;}
+
+  /* TOPBAR (back) */
+  .topbar{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .back-btn{ background:none; border:1px solid var(--line); color:var(--paper); border-radius:8px; padding:7px 12px; font-size:14px; cursor:pointer; }
+  .back-btn:active{ background:rgba(255,255,255,0.08); }
+  .screen-title{ font-size:18px; color:var(--sky); }
+
+  /* PRACTICE */
+  .progress-row{ display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+  .progress-track{ flex:1; height:6px; background:rgba(255,255,255,0.12); border-radius:4px; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--gold); transition: width .3s ease; }
+  .progress-count{ font-family: 'SFMono-Regular', Consolas, monospace; font-size:13px; color:var(--sky); white-space:nowrap; }
+
+  .card-index{
+    background: var(--paper); color:var(--ink); border-radius:16px; padding:0; overflow:hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .card-notch{ height:14px; background:repeating-linear-gradient(to right, transparent 0 10px, rgba(0,0,0,0.15) 10px 12px); }
+  .card-body{ padding:26px 24px 22px; text-align:center; }
+  .card-img-wrap{ margin:0 auto 14px; width:100%; max-height:180px; display:flex; align-items:center; justify-content:center; }
+  .card-img-wrap img{ max-width:100%; max-height:180px; border-radius:10px; object-fit:contain; }
+  .en-word{ font-size:30px; margin:2px 0 6px; }
+  .listen-btn{ background:none; border:1px solid #b7ab8a; color:#6b6448; border-radius:20px; padding:5px 14px; font-size:13px; cursor:pointer; margin-bottom:8px; }
+  .listen-btn:active{ background:#efe7d3; }
+  .stamp-badge{ display:inline-block; font-family:'SFMono-Regular', Consolas, monospace; font-size:10.5px; letter-spacing:1px; padding:3px 8px; border-radius:20px; margin-top:6px; }
+  .stamp-new{ background:#e3ddc8; color:#7a7150; }
+  .stamp-mastered{ background:#dcebe1; color:var(--green); }
+  .pos-badge{ display:inline-block; font-size:11.5px; letter-spacing:0.5px; color:#6b6448; border:1px solid #c9bd9c; border-radius:20px; padding:3px 10px; margin:2px 0 8px; }
+  .pos-tag{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:#8f8461; background:#efe9d6; border-radius:5px; padding:1px 6px; margin-left:6px; white-space:nowrap; }
+
+  .answer-row{ display:flex; gap:10px; margin-top:20px; }
+  .answer-row input{ flex:1; padding:13px 14px; border-radius:10px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--paper); font-size:16px; }
+  .answer-row input::placeholder{ color:#8895ab; }
+  .btn-primary{ background:var(--gold); color:var(--ink); border:none; border-radius:10px; padding:0 20px; font-size:15px; font-weight:600; cursor:pointer; }
+  .btn-primary:active{ background:var(--gold-dim); }
+  .btn-secondary{ background:transparent; color:var(--paper); border:1px solid var(--line); border-radius:10px; padding:12px 18px; font-size:14px; cursor:pointer; }
+
+  .feedback{ margin-top:16px; padding:14px 16px; border-radius:10px; font-size:15px; display:none; }
+  .feedback.show{ display:block; }
+  .feedback.ok{ background:rgba(63,125,88,0.18); border:1px solid var(--green); }
+  .feedback.bad{ background:rgba(179,66,63,0.18); border:1px solid var(--red); }
+  .feedback .correct-answer{ color:var(--gold); font-weight:600; }
+
+  /* SUMMARY */
+  .summary-score{ text-align:center; margin:18px 0 26px; }
+  .summary-score .big{ font-size:52px; font-family:'SFMono-Regular', Consolas, monospace; color:var(--gold); }
+  .summary-score .of{ font-size:16px; color:var(--sky); }
+  .fail-list{ background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:6px 16px; margin-bottom:20px;}
+  .fail-list .row{ display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); font-size:14.5px;}
+  .fail-list .row:last-child{ border-bottom:none; }
+  .fail-list .row .es{ color:var(--sky); }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn-row > *{ flex:1; }
+
+  /* MANAGE */
+  .add-form{ background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:20px; }
+  .add-form label{ font-size:11.5px; text-transform:uppercase; letter-spacing:1px; color:var(--sky); display:block; margin:10px 0 5px; }
+  .add-form label:first-child{ margin-top:0; }
+  .add-form input[type=text]{ width:100%; padding:11px 12px; border-radius:8px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--paper); font-size:15px; }
+  .add-form .hint{ font-size:12px; color:#8895ab; margin-top:4px; }
+  .img-row{ display:flex; align-items:center; gap:12px; margin-top:6px; }
+  .img-preview{ width:56px; height:56px; border-radius:8px; object-fit:cover; background:rgba(255,255,255,0.08); display:none; }
+  .img-preview.show{ display:block; }
+  .file-btn{ background:transparent; border:1px dashed var(--line); color:var(--sky); border-radius:8px; padding:9px 14px; font-size:13px; cursor:pointer; }
+
+  .word-list{ display:flex; flex-direction:column; gap:8px; }
+  .word-row{ display:flex; align-items:center; gap:12px; background:var(--paper); color:var(--ink); border-radius:10px; padding:10px 12px; }
+  .word-row .thumb{ width:38px; height:38px; border-radius:6px; object-fit:cover; background:#e7e0cc; flex-shrink:0; }
+  .word-row .thumb.empty{ display:flex; align-items:center; justify-content:center; font-size:11px; color:#a89b78; }
+  .word-row .txt{ flex:1; min-width:0; }
+  .word-row .txt .en{ font-weight:600; font-size:14.5px; }
+  .word-row .txt .es{ font-size:12.5px; color:#6b6448; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .word-row .actions{ display:flex; gap:6px; }
+  .icon-btn{ background:none; border:none; font-size:16px; cursor:pointer; padding:4px 6px; }
+  .search-box{ width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--line); background:rgba(255,255,255,0.05); color:var(--paper); font-size:14.5px; margin-bottom:14px; }
+
+  .empty-state{ text-align:center; padding:40px 20px; color:var(--sky); }
+  .empty-state .big-icon{ font-size:40px; margin-bottom:10px; }
+
+  /* IMPORT/EXPORT */
+  .io-block{ background:rgba(255,255,255,0.05); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+  .io-block h4{ margin:0 0 6px; font-size:15px; }
+  .io-block p{ margin:0 0 12px; font-size:13px; color:var(--sky); line-height:1.5; }
+  .file-input-hidden{ display:none; }
+  textarea.csv-preview{ width:100%; height:90px; background:rgba(0,0,0,0.25); border:1px solid var(--line); border-radius:8px; color:var(--paper); font-family:monospace; font-size:11.5px; padding:8px; margin-top:8px; }
+
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--paper); color:var(--ink); padding:11px 20px; border-radius:30px; font-size:14px; box-shadow:0 8px 24px rgba(0,0,0,0.4); opacity:0; pointer-events:none; transition: opacity .25s, transform .25s; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Misión Vocabulario</div>
+      <div class="title display">Vocabulario en inglés</div>
+    </div>
+  </header>
+
+  <!-- MENU -->
+  <section class="screen active" id="screen-menu">
+    <div class="dir-toggle">
+      <button class="dir-btn" id="dir-btn-en-es" onclick="setDirection('en-es')">Inglés → Castellano</button>
+      <button class="dir-btn" id="dir-btn-es-en" onclick="setDirection('es-en')">Castellano → Inglés</button>
+    </div>
+    <div class="stat-strip">
+      <div class="stat-pill"><div class="n mono" id="stat-total">0</div><div class="l">Palabras</div></div>
+      <div class="stat-pill"><div class="n mono" id="stat-mastered">0</div><div class="l">Dominadas</div></div>
+      <div class="stat-pill"><div class="n mono" id="stat-review">0</div><div class="l">A reforzar</div></div>
+    </div>
+    <div class="menu-grid">
+      <button class="menu-card" onclick="goPractice('random')">
+        <div class="num">01</div>
+        <h3>Practicar</h3>
+        <p>Lote de 15 palabras al azar, inglés → castellano.</p>
+        <div class="stub"></div>
+      </button>
+      <button class="menu-card" onclick="goPractice('hard')">
+        <div class="num">02</div>
+        <h3>Repasar difíciles</h3>
+        <p>Prioriza las palabras que más fallas.</p>
+        <div class="stub"></div>
+      </button>
+      <button class="menu-card" onclick="showScreen('screen-manage'); renderManage();">
+        <div class="num">03</div>
+        <h3>Gestionar palabras</h3>
+        <p>Añadir, editar o borrar palabras e imágenes.</p>
+        <div class="stub"></div>
+      </button>
+      <button class="menu-card" onclick="showScreen('screen-io')">
+        <div class="num">04</div>
+        <h3>Importar / Exportar</h3>
+        <p>Cargar o guardar tu lista en CSV, o hacer copia de seguridad completa.</p>
+        <div class="stub"></div>
+      </button>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section class="screen" id="screen-practice">
+    <div class="topbar">
+      <button class="back-btn" onclick="confirmExitPractice()">← Menú</button>
+      <span class="screen-title" id="practice-mode-label">Practicar</span>
+    </div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-count mono" id="progress-count">0/0</div>
+    </div>
+
+    <div class="card-index">
+      <div class="card-notch"></div>
+      <div class="card-body">
+        <div class="card-img-wrap" id="card-img-wrap"></div>
+        <div class="en-word display" id="en-word">—</div>
+        <div><span class="pos-badge" id="pos-badge" style="display:none;"></span></div>
+        <button class="listen-btn" onclick="speakCurrent()">🔊 Escuchar</button>
+        <div><span class="stamp-badge" id="stamp-badge"></span></div>
+      </div>
+    </div>
+
+    <div class="answer-row">
+      <input type="text" id="answer-input" placeholder="Escribe el significado en castellano" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button class="btn-primary" onclick="checkAnswer()">Comprobar</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="screen" id="screen-summary">
+    <div class="topbar">
+      <span class="screen-title">Resultado del lote</span>
+    </div>
+    <div class="summary-score">
+      <div class="big mono" id="summary-score">0/0</div>
+      <div class="of">aciertos a la primera</div>
+    </div>
+    <div id="summary-fails-wrap"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="showScreen('screen-menu'); renderMenu();">Menú</button>
+      <button class="btn-primary" id="btn-review-fails" onclick="reviewFails()" style="display:none;">Repasar fallos</button>
+      <button class="btn-primary" onclick="goPractice(lastMode)">Otro lote</button>
+    </div>
+  </section>
+
+  <!-- MANAGE -->
+  <section class="screen" id="screen-manage">
+    <div class="topbar">
+      <button class="back-btn" onclick="showScreen('screen-menu'); renderMenu();">← Menú</button>
+      <span class="screen-title">Gestionar palabras</span>
+    </div>
+
+    <div class="add-form">
+      <label>Inglés</label>
+      <input type="text" id="form-en" placeholder="p. ej. commute">
+      <label>Castellano (varias válidas separadas por /)</label>
+      <input type="text" id="form-es" placeholder="p. ej. desplazarse al trabajo / trayecto">
+      <div class="hint">Si aceptas varias respuestas válidas, sepáralas con "/".</div>
+      <label>Categoría gramatical</label>
+      <select id="form-pos" style="width:100%; padding:11px 12px; border-radius:8px; border:1px solid var(--line); background:rgba(255,255,255,0.04); color:var(--paper); font-size:15px;">
+        <option value="">— sin especificar —</option>
+        <option value="verbo">Verbo</option>
+        <option value="sustantivo">Sustantivo</option>
+        <option value="adjetivo">Adjetivo</option>
+        <option value="adverbio">Adverbio</option>
+        <option value="expresion">Expresión / frase hecha</option>
+        <option value="otro">Otro</option>
+      </select>
+      <label>Imagen (opcional)</label>
+      <div class="img-row">
+        <img id="form-img-preview" class="img-preview">
+        <button class="file-btn" onclick="document.getElementById('form-img-file').click()">📷 Elegir / hacer foto</button>
+        <input type="file" accept="image/*" id="form-img-file" class="file-input-hidden" onchange="handleImageSelect(event)">
+      </div>
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="btn-secondary" onclick="clearForm()">Limpiar</button>
+        <button class="btn-primary" onclick="saveWordFromForm()" id="form-save-btn">Añadir palabra</button>
+      </div>
+    </div>
+
+    <input type="text" class="search-box" id="manage-search" placeholder="Buscar..." oninput="renderManage()">
+    <div class="word-list" id="word-list"></div>
+  </section>
+
+  <!-- IMPORT/EXPORT -->
+  <section class="screen" id="screen-io">
+    <div class="topbar">
+      <button class="back-btn" onclick="showScreen('screen-menu'); renderMenu();">← Menú</button>
+      <span class="screen-title">Importar / Exportar</span>
+    </div>
+
+    <div class="io-block">
+      <h4>Importar desde CSV / Excel</h4>
+      <p>El archivo debe tener columnas: <b>ingles</b>, <b>castellano</b> y, opcionalmente, <b>categoria</b> (verbo, sustantivo, adjetivo, adverbio, expresion, otro). En Excel, guarda tu hoja como "CSV (UTF-8)" y cárgala aquí. Si una palabra ya existe, se actualiza su traducción y categoría; si no, se añade nueva (sin imagen).</p>
+      <button class="btn-secondary" onclick="document.getElementById('csv-file').click()">Elegir archivo CSV</button>
+      <input type="file" accept=".csv,text/csv" id="csv-file" class="file-input-hidden" onchange="handleCsvImport(event)">
+    </div>
+
+    <div class="io-block">
+      <h4>Exportar a CSV</h4>
+      <p>Descarga tu lista actual (inglés/castellano) para editarla en Excel o guardarla como copia. No incluye imágenes.</p>
+      <button class="btn-primary" onclick="exportCsv()">Descargar CSV</button>
+    </div>
+
+    <div class="io-block">
+      <h4>Copia de seguridad completa</h4>
+      <p>Incluye imágenes y estadísticas de progreso. Útil para pasar la lista a otra tablet o restaurarla si borras el navegador.</p>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="exportJson()">Guardar copia (.json)</button>
+        <button class="btn-secondary" onclick="document.getElementById('json-file').click()">Restaurar copia</button>
+      </div>
+      <input type="file" accept=".json,application/json" id="json-file" class="file-input-hidden" onchange="handleJsonImport(event)">
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- estado y almacenamiento ---------- */
+const STORAGE_KEY = 'vocabApp_words_v1';
+let words = [];
+let currentScreen = 'screen-menu';
+let editingId = null;
+let pendingImageDataUrl = null;
+
+let queue = [];        // cola de la sesión actual (ids)
+let batchTotal = 0;
+let firstTryCorrect = 0;
+let askedFirstTry = new Set();
+let failedWords = [];  // palabras falladas alguna vez en el lote
+let current = null;
+let lastMode = 'random';
+let practiceDirection = localStorage.getItem('vocabApp_direction') || 'en-es';
+
+function setDirection(dir){
+  practiceDirection = dir;
+  localStorage.setItem('vocabApp_direction', dir);
+  renderMenu();
+}
+
+function loadWords(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    words = raw ? JSON.parse(raw) : [];
+  }catch(e){ words = []; }
+}
+function saveWords(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+}
+function uid(){ return 'w_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ---------- utilidades ---------- */
+function normalize(s){
+  return (s||'').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function esAlternatives(esField){
+  return esField.split('/').map(s=>s.trim()).filter(Boolean);
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function weightedSample(pool, n){
+  const items = pool.map(w => ({ w, weight: Math.max(0.15, 1 + (w.wrongCount||0)*2 - (w.correctCount||0)*0.3) }));
+  const result = [];
+  n = Math.min(n, items.length);
+  for(let i=0;i<n;i++){
+    const total = items.reduce((s,p)=>s+p.weight,0);
+    let r = Math.random()*total, acc=0, idx=0;
+    for(; idx<items.length; idx++){ acc += items[idx].weight; if(r<=acc) break; }
+    if(idx>=items.length) idx = items.length-1;
+    result.push(items[idx].w);
+    items.splice(idx,1);
+  }
+  return result;
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  currentScreen = id;
+}
+
+/* ---------- menú ---------- */
+function renderMenu(){
+  document.getElementById('dir-btn-en-es').classList.toggle('active', practiceDirection==='en-es');
+  document.getElementById('dir-btn-es-en').classList.toggle('active', practiceDirection==='es-en');
+  document.getElementById('stat-total').textContent = words.length;
+  const mastered = words.filter(w => (w.correctCount||0) >= 3 && (w.correctCount||0) > (w.wrongCount||0)).length;
+  const review = words.filter(w => (w.wrongCount||0) > (w.correctCount||0) && (w.wrongCount||0) > 0).length;
+  document.getElementById('stat-mastered').textContent = mastered;
+  document.getElementById('stat-review').textContent = review;
+}
+
+/* ---------- práctica ---------- */
+function goPractice(mode){
+  if(words.length === 0){
+    toast('Añade palabras primero en "Gestionar palabras".');
+    showScreen('screen-menu');
+    return;
+  }
+  lastMode = mode;
+  const size = Math.min(15, words.length);
+  let selected;
+  if(mode === 'hard'){
+    selected = weightedSample(words, size);
+  } else {
+    selected = shuffle(words).slice(0, size);
+  }
+  queue = selected.map(w => w.id);
+  batchTotal = queue.length;
+  firstTryCorrect = 0;
+  askedFirstTry = new Set();
+  failedWords = [];
+  document.getElementById('practice-mode-label').textContent = mode === 'hard' ? 'Repasar difíciles' : 'Practicar';
+  showScreen('screen-practice');
+  nextQuestion();
+}
+
+function confirmExitPractice(){
+  showScreen('screen-menu');
+  renderMenu();
+}
+
+function nextQuestion(){
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('answer-input').value = '';
+  if(queue.length === 0){
+    finishBatch();
+    return;
+  }
+  const id = queue.shift();
+  current = words.find(w => w.id === id);
+  if(!current){ nextQuestion(); return; }
+
+  const answeredCount = askedFirstTry.size;
+  const doneEstimate = batchTotal - (queue.length + 1);
+  document.getElementById('progress-count').textContent = `${Math.max(0,doneEstimate)}/${batchTotal}`;
+  document.getElementById('progress-fill').style.width = (Math.max(0,doneEstimate)/batchTotal*100) + '%';
+
+  const questionText = practiceDirection === 'es-en'
+    ? esAlternatives(current.es)[0] || current.es
+    : current.en;
+  document.getElementById('en-word').textContent = questionText;
+  document.getElementById('answer-input').placeholder = practiceDirection === 'es-en'
+    ? 'Escribe la palabra en inglés'
+    : 'Escribe el significado en castellano';
+  const imgWrap = document.getElementById('card-img-wrap');
+  imgWrap.innerHTML = current.img ? `<img src="${current.img}" alt="">` : '';
+
+  const posLabels = { verbo:'verbo', sustantivo:'sustantivo', adjetivo:'adjetivo', adverbio:'adverbio', expresion:'expresión', otro:'otro' };
+  const posBadge = document.getElementById('pos-badge');
+  if(current.pos && posLabels[current.pos]){
+    posBadge.textContent = posLabels[current.pos];
+    posBadge.style.display = 'inline-block';
+  } else {
+    posBadge.style.display = 'none';
+  }
+
+  const mastered = (current.correctCount||0) >= 3 && (current.correctCount||0) > (current.wrongCount||0);
+  const badge = document.getElementById('stamp-badge');
+  badge.textContent = mastered ? '✓ dominada' : 'nueva / en curso';
+  badge.className = 'stamp-badge ' + (mastered ? 'stamp-mastered' : 'stamp-new');
+
+  document.getElementById('answer-input').focus();
+}
+
+function speakCurrent(){
+  if(!current) return;
+  if(!('speechSynthesis' in window)){ toast('Este dispositivo no soporta voz.'); return; }
+  const u = new SpeechSynthesisUtterance(current.en);
+  u.lang = 'en-US';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+function checkAnswer(){
+  if(!current) return;
+  const val = normalize(document.getElementById('answer-input').value);
+  if(!val) return;
+  const targetField = practiceDirection === 'es-en' ? current.en : current.es;
+  const alts = esAlternatives(targetField).map(normalize);
+  const isCorrect = alts.includes(val);
+  const isFirstAttempt = !askedFirstTry.has(current.id);
+  askedFirstTry.add(current.id);
+
+  const fb = document.getElementById('feedback');
+  if(isCorrect){
+    current.correctCount = (current.correctCount||0) + 1;
+    if(isFirstAttempt) firstTryCorrect++;
+    fb.className = 'feedback show ok';
+    fb.textContent = '✓ ¡Correcto!';
+    saveWords();
+    setTimeout(nextQuestion, 550);
+  } else {
+    current.wrongCount = (current.wrongCount||0) + 1;
+    if(isFirstAttempt && !failedWords.includes(current.id)) failedWords.push(current.id);
+    fb.className = 'feedback show bad';
+    const correctAnswer = practiceDirection === 'es-en' ? current.en.split('/')[0].trim() : current.es.split('/')[0].trim();
+    fb.innerHTML = `✗ No es correcto. Respuesta: <span class="correct-answer">${correctAnswer}</span>`;
+    saveWords();
+    queue.push(current.id); // se repite más adelante en este mismo lote
+    setTimeout(nextQuestion, 1400);
+  }
+}
+document.getElementById('answer-input').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') checkAnswer();
+});
+
+function finishBatch(){
+  document.getElementById('summary-score').textContent = `${firstTryCorrect}/${batchTotal}`;
+  const wrap = document.getElementById('summary-fails-wrap');
+  const btnReview = document.getElementById('btn-review-fails');
+  if(failedWords.length > 0){
+    const rows = failedWords.map(id=>{
+      const w = words.find(x=>x.id===id);
+      if(!w) return '';
+      const q = practiceDirection === 'es-en' ? w.es.split('/')[0].trim() : w.en;
+      const a = practiceDirection === 'es-en' ? w.en.split('/')[0].trim() : w.es.split('/')[0].trim();
+      return `<div class="row"><span>${q}</span><span class="es">${a}</span></div>`;
+    }).join('');
+    wrap.innerHTML = `<div class="fail-list">${rows}</div>`;
+    btnReview.style.display = 'block';
+  } else {
+    wrap.innerHTML = `<p style="text-align:center;color:var(--sky);">Sin fallos. ¡Lote perfecto!</p>`;
+    btnReview.style.display = 'none';
+  }
+  showScreen('screen-summary');
+}
+
+function reviewFails(){
+  if(failedWords.length === 0) return;
+  queue = failedWords.slice();
+  batchTotal = queue.length;
+  firstTryCorrect = 0;
+  askedFirstTry = new Set();
+  failedWords = [];
+  document.getElementById('practice-mode-label').textContent = 'Repaso de fallos';
+  showScreen('screen-practice');
+  nextQuestion();
+}
+
+/* ---------- gestionar palabras ---------- */
+function handleImageSelect(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const maxSize = 300;
+      let w = img.width, h = img.height;
+      if(w > h && w > maxSize){ h = h*(maxSize/w); w = maxSize; }
+      else if(h > maxSize){ w = w*(maxSize/h); h = maxSize; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      pendingImageDataUrl = canvas.toDataURL('image/jpeg', 0.72);
+      const preview = document.getElementById('form-img-preview');
+      preview.src = pendingImageDataUrl;
+      preview.classList.add('show');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearForm(){
+  editingId = null;
+  pendingImageDataUrl = null;
+  document.getElementById('form-en').value = '';
+  document.getElementById('form-es').value = '';
+  document.getElementById('form-pos').value = '';
+  document.getElementById('form-img-preview').classList.remove('show');
+  document.getElementById('form-img-preview').src = '';
+  document.getElementById('form-save-btn').textContent = 'Añadir palabra';
+}
+
+function saveWordFromForm(){
+  const en = document.getElementById('form-en').value.trim();
+  const es = document.getElementById('form-es').value.trim();
+  const pos = document.getElementById('form-pos').value;
+  if(!en || !es){ toast('Escribe inglés y castellano.'); return; }
+
+  if(editingId){
+    const w = words.find(x=>x.id===editingId);
+    if(w){
+      w.en = en; w.es = es; w.pos = pos;
+      if(pendingImageDataUrl) w.img = pendingImageDataUrl;
+    }
+  } else {
+    const exists = words.some(w => normalize(w.en) === normalize(en));
+    if(exists){ toast('Esa palabra ya existe.'); return; }
+    words.push({ id: uid(), en, es, pos, img: pendingImageDataUrl || null, correctCount:0, wrongCount:0 });
+  }
+  saveWords();
+  clearForm();
+  renderManage();
+  toast('Guardado.');
+}
+
+function editWord(id){
+  const w = words.find(x=>x.id===id);
+  if(!w) return;
+  editingId = id;
+  pendingImageDataUrl = null;
+  document.getElementById('form-en').value = w.en;
+  document.getElementById('form-es').value = w.es;
+  document.getElementById('form-pos').value = w.pos || '';
+  const preview = document.getElementById('form-img-preview');
+  if(w.img){ preview.src = w.img; preview.classList.add('show'); }
+  else{ preview.classList.remove('show'); preview.src=''; }
+  document.getElementById('form-save-btn').textContent = 'Guardar cambios';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function deleteWord(id){
+  const w = words.find(x=>x.id===id);
+  if(!w) return;
+  if(!confirm(`¿Borrar "${w.en}"?`)) return;
+  words = words.filter(x=>x.id!==id);
+  saveWords();
+  renderManage();
+}
+
+function renderManage(){
+  const q = normalize(document.getElementById('manage-search').value);
+  const list = document.getElementById('word-list');
+  const filtered = words.filter(w => !q || normalize(w.en).includes(q) || normalize(w.es).includes(q));
+  if(words.length === 0){
+    list.innerHTML = `<div class="empty-state"><div class="big-icon">📖</div>Todavía no hay palabras.<br>Añade la primera con el formulario de arriba.</div>`;
+    return;
+  }
+  if(filtered.length === 0){
+    list.innerHTML = `<div class="empty-state">Sin resultados para esa búsqueda.</div>`;
+    return;
+  }
+  const posLabels = { verbo:'verbo', sustantivo:'sust.', adjetivo:'adj.', adverbio:'adv.', expresion:'expr.', otro:'otro' };
+  list.innerHTML = filtered.map(w => `
+    <div class="word-row">
+      ${w.img ? `<img class="thumb" src="${w.img}">` : `<div class="thumb empty">—</div>`}
+      <div class="txt">
+        <div class="en">${w.en}${w.pos && posLabels[w.pos] ? `<span class="pos-tag">${posLabels[w.pos]}</span>` : ''}</div>
+        <div class="es">${w.es}</div>
+      </div>
+      <div class="actions">
+        <button class="icon-btn" onclick="editWord('${w.id}')">✏️</button>
+        <button class="icon-btn" onclick="deleteWord('${w.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ---------- CSV ---------- */
+function parseCsvLine(line){
+  const out = [];
+  let cur = '', inQuotes = false;
+  for(let i=0;i<line.length;i++){
+    const c = line[i];
+    if(inQuotes){
+      if(c === '"' && line[i+1] === '"'){ cur+='"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else cur += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ out.push(cur); cur=''; }
+      else cur += c;
+    }
+  }
+  out.push(cur);
+  return out.map(s=>s.trim());
+}
+
+function handleCsvImport(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/).filter(l => l.trim().length>0);
+    if(lines.length===0){ toast('Archivo vacío.'); return; }
+    let start = 0;
+    const firstCols = parseCsvLine(lines[0]).map(s=>normalize(s));
+    if(firstCols[0] && (firstCols[0].includes('ingles') || firstCols[0].includes('english') || firstCols[0]==='en')){
+      start = 1;
+    }
+    let added = 0, updated = 0;
+    for(let i=start;i<lines.length;i++){
+      const cols = parseCsvLine(lines[i]);
+      const en = (cols[0]||'').trim();
+      const es = (cols[1]||'').trim();
+      const pos = (cols[2]||'').trim().toLowerCase();
+      if(!en || !es) continue;
+      const existing = words.find(w => normalize(w.en) === normalize(en));
+      if(existing){ existing.es = es; if(pos) existing.pos = pos; updated++; }
+      else{ words.push({ id: uid(), en, es, pos: pos||'', img:null, correctCount:0, wrongCount:0 }); added++; }
+    }
+    saveWords();
+    renderManage();
+    toast(`Importado: ${added} nuevas, ${updated} actualizadas.`);
+    evt.target.value = '';
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function csvEscape(s){
+  if(/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+  return s;
+}
+function exportCsv(){
+  if(words.length===0){ toast('No hay palabras que exportar.'); return; }
+  let csv = 'ingles,castellano,categoria\n';
+  words.forEach(w=>{ csv += csvEscape(w.en) + ',' + csvEscape(w.es) + ',' + csvEscape(w.pos||'') + '\n'; });
+  downloadFile(csv, 'vocabulario.csv', 'text/csv');
+}
+
+/* ---------- backup JSON ---------- */
+function exportJson(){
+  if(words.length===0){ toast('No hay palabras que exportar.'); return; }
+  downloadFile(JSON.stringify(words, null, 2), 'vocabulario-backup.json', 'application/json');
+}
+function handleJsonImport(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('formato inválido');
+      if(words.length>0 && !confirm('Esto reemplazará tu lista actual por la de la copia. ¿Continuar?')) return;
+      words = data;
+      saveWords();
+      renderManage();
+      toast(`Restaurado: ${words.length} palabras.`);
+    }catch(err){
+      toast('El archivo no es una copia válida.');
+    }
+    evt.target.value = '';
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function downloadFile(content, filename, mime){
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- init ---------- */
+loadWords();
+renderMenu();
+renderManage();
+</script>
+</body>
+</html>
